@@ -1,0 +1,147 @@
+New variables:
+
+numberbehind - out of the six months, how many behind on payments, plus value
+numberahead - out of the six months, how many ahead on payments, minus value
+statustrend - fit a line to the six numbers; slope of that line
+
+billoverlimit - BILL_AMT1/LIMIT_BAL, =1 if LIMIT_BAL=0
+billtrend - fit a line to the six numbers; slope of that line
+billsurge - BILL_AMT1/(mean of BILL_AMTx for the six months), =1 if mean=0 
+
+payroundcount - of the six months, how many payments ended in "00"
+payoverbill - ratio PAY_AMT1/BILL_AMT1; =1 if bill=0
+paytrend - fit a line to the six numbers; slope of that line
+paysurge - PAY_AMT1/(mean of PAY_AMTx for the six months), =1 if mean=0 
+payzero - 1 iff PAY_AMT1 = 0 and BILL_AMT1 >0
+paygiveup - 1 iff PAY_AMT1 = 0 and PAY_AMT2 >0 and BILL_AMT1 >0 and BILL_AMT2 >0
+payoverlimit - PAY_AMT1/LIMIT_BAL, =1 if LIMIT_BAL=0
+
+
+R code implementation:
+
+For ease of typing,
+$cd=$creditdefault;
+
+nb1={}
+nb1[cd$PAY_0>0] <- 1
+nb1[cd$PAY_0<=0] <- 0
+nb2={}
+nb2[cd$PAY_2>0] <- 1
+nb2[cd$PAY_2<=0] <- 0
+nb3={}
+nb3[cd$PAY_3>0] <- 1
+nb3[cd$PAY_3<=0] <- 0
+nb4={}
+nb4[cd$PAY_4>0] <- 1
+nb4[cd$PAY_4<=0] <- 0
+nb5={}
+nb5[cd$PAY_5>0] <- 1
+nb5[cd$PAY_5<=0] <- 0
+nb6={}
+nb6[cd$PAY_6>0] <- 1
+nb6[cd$PAY_6<=0] <- 0
+numberbehind <- nb1+nb2+nb3+nb4+nb5+nb6
+cd$numberbehind <- numberbehind
+
+na1={}
+na1[cd$PAY_0<0] <- 1
+na1[cd$PAY_0>=0] <- 0
+na2={}
+na2[cd$PAY_2<0] <- 1
+na2[cd$PAY_2>=0] <- 0
+na3={}
+na3[cd$PAY_3<0] <- 1
+na3[cd$PAY_3>=0] <- 0
+na4={}
+na4[cd$PAY_4<0] <- 1
+na4[cd$PAY_4>=0] <- 0
+na5={}
+na5[cd$PAY_5<0] <- 1
+na5[cd$PAY_5>=0] <- 0
+na6={}
+na6[cd$PAY_6<0] <- 1
+na6[cd$PAY_6>=0] <- 0
+numberahead <- na1+na2+na3+na4+na5+na6
+cd$numberahead <- numberahead
+
+statustrend <- 2.5*cd$PAY_0 + 1.5*cd$PAY_2 + .5*cd$PAY_3 -.5*cd$PAY_4 -1.5*cd$PAY_5 -2.5*cd$PAY_6
+cd$statustrend <- statustrend
+
+
+bol={}
+bol[cd$LIMIT_BAL==0] <- 1
+bol[cd$LIMIT_BAL!=0] <- cd$BILL_AMT1/cd$LIMIT_BAL
+cd$billoverlimit=bol
+
+billtrend <- 2.5*cd$BILL_AMT1 + 1.5*cd$BILL_AMT2 + .5*cd$BILL_AMT3 -.5*cd$BILL_AMT4 -1.5*cd$BILL_AMT5 -2.5*cd$BILL_AMT6
+cd$billtrend <- billtrend
+(This is a simplified version of the formula for a linear least-square fit.)
+
+bs={}
+bs[cd$BILL_AMT1+cd$BILL_AMT2+cd$BILL_AMT3+cd$BILL_AMT4+cd$BILL_AMT5+cd$BILL_AMT6==0] <- 1
+bs[cd$BILL_AMT1+cd$BILL_AMT2+cd$BILL_AMT3+cd$BILL_AMT4+cd$BILL_AMT5+cd$BILL_AMT6!=0] <- (cd$BILL_AMT1+cd$BILL_AMT2+cd$BILL_AMT3+cd$BILL_AMT4+cd$BILL_AMT5+cd$BILL_AMT6)/6
+cd$billsurge=bs
+
+
+
+nz1={}
+start=nchar(cd$PAY_AMT1)-1
+end=nchar(cd$PAY_AMT1)
+nz1[substr(cd$PAY_AMT1,start,end)=="00"]<- 1
+nz1[substr(cd$PAY_AMT1,start,end)!="00"] <- 0
+nz2={}
+start=nchar(cd$PAY_AMT2)-1
+end=nchar(cd$PAY_AMT2)
+nz2[substr(cd$PAY_AMT2,start,end)=="00"]<- 1
+nz2[substr(cd$PAY_AMT2,start,end)!="00"] <- 0
+nz3={}
+start=nchar(cd$PAY_AMT3)-1
+end=nchar(cd$PAY_AMT3)
+nz3[substr(cd$PAY_AMT3,start,end)=="00"]<- 1
+nz3[substr(cd$PAY_AMT3,start,end)!="00"] <- 0
+nz4={}
+start=nchar(cd$PAY_AMT4)-1
+end=nchar(cd$PAY_AMT4)
+nz4[substr(cd$PAY_AMT4,start,end)=="00"]<- 1
+nz4[substr(cd$PAY_AMT4,start,end)!="00"] <- 0
+nz5={}
+start=nchar(cd$PAY_AMT5)-1
+end=nchar(cd$PAY_AMT5)
+nz5[substr(cd$PAY_AMT5,start,end)=="00"]<- 1
+nz5[substr(cd$PAY_AMT5,start,end)!="00"] <- 0
+nz6={}
+start=nchar(cd$PAY_AMT6)-1
+end=nchar(cd$PAY_AMT6)
+nz6[substr(cd$PAY_AMT6,start,end)=="00"]<- 1
+nz6[substr(cd$PAY_AMT6,start,end)!="00"] <- 0
+cd$payroundcount=nz1+nz2+nz3+nz4+nz5+nz6
+
+pob={}
+pob<- cd$PAY_AMT1/(cd$BILL_AMT1+.001)
+cd$payoverbill=pob
+
+paytrend <- 2.5*cd$PAY_AMT1 + 1.5*cd$PAY_AMT2 + .5*cd$PAY_AMT3 -.5*cd$PAY_AMT4 -1.5*cd$PAY_AMT5 -2.5*cd$PAY_AMT6
+cd$paytrend <- paytrend
+
+ps={}
+ps <- cd$PAY_AMT1/(((cd$PAY_AMT1+cd$PAY_AMT2+cd$PAY_AMT3+cd$PAY_AMT4+cd$PAY_AMT5+cd$PAY_AMT6)/6)+.001)
+cd$paysurge=ps
+
+pz={}
+pz[cd$PAY_AMT1==0 & cd$BILL_AMT1>0] <- 1
+pz[cd$PAY_AMT1!=0 | cd$BILL_AMT1<=0] <- 0
+cd$payzero=pz
+
+pgu={}
+pgu[cd$PAY_AMT1==0 & cd$PAY_AMT2>0 & cd$BILL_AMT1>0 & cd$BILL_AMT2>0] <- 1
+pgu[cd$PAY_AMT1!=0 | cd$PAY_AMT2<=0 | cd$BILL_AMT1<=0 | cd$BILL_AMT2<=0] <- 0
+cd$paygiveup=pgu
+
+pol={}
+pol[cd$LIMIT_BAL==0] <- 1
+pol[cd$LIMIT_BAL!=0] <- cd$PAY_AMT1/cd$LIMIT_BAL
+cd$payoverlimit=pol
+
+Whew, that's a lot...random forest, tell me which are useful...
+
+
