@@ -23,9 +23,10 @@ To fully benefit from the coverage included in this course, you will need:<br/>
 This course is for aspiring data scientists who are familiar with the basics of the R language and data frames, and have a basic knowledge of statistics. You are not expected to have any knowledge of machine-learning systems. If you are looking to understand how the R programming environment and packages can be used to develop machine learning systems, then this is the perfect course for you.
 ### Technical Requirements
 This course has the following software requirements:<br/>
-IDE : R Studio
-Notepad++
-Browser : Chrome or equivalentt Version
+<UL>
+<LI>IDE : R Studio
+<LI>Notepad++
+<LI>Browser : Chrome or equivalentt Version</LI></UL>
 
 ## Related Products
 * [Python Machine Learning in 7 Days [Video]](https://www.packtpub.com/big-data-and-business-intelligence/python-machine-learning-7-days-video?utm_source=github&utm_medium=repository&utm_campaign=9781788999137)
