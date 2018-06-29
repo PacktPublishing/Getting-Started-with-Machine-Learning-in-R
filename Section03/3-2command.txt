@@ -1,0 +1,52 @@
+
+setwd("c:/mlr")
+
+
+pimatrain <- read.csv("pimatrainfixed314.csv")
+pimatest <- read.csv("pimatestfixed314.csv")
+
+summary(pimatrain)
+summary(pimatest)
+
+
+lifit <- lm(diabetes ~ pregnant + glucose + bloodpressure + skinfold + insulin + bodymassindex + diabetespedigree + age, data = pimatrain)
+
+summary(lifit)
+
+lipred <- predict(lifit,newdata=pimatest)
+
+summary(lipred)
+
+lipred[lipred <=.5] <- 0
+lipred[lipred >.5] <- 1
+
+lipred
+
+
+sum(lipred==0 & pimatest$diabetes ==0)
+sum(lipred==0 & pimatest$diabetes ==1)
+sum(lipred==1 & pimatest$diabetes ==0)
+sum(lipred==1 & pimatest$diabetes ==1)
+
+
+
+lofit <- glm(diabetes ~ pregnant + glucose + bloodpressure + skinfold + insulin + bodymassindex + diabetespedigree + age, family=binomial(link='logit'), data = pimatrain)
+
+summary(lofit)
+
+lopred <- predict(lofit,newdata=pimatest)
+
+lopred[lopred <=.5] <- 0
+lopred[lopred >.5] <- 1
+
+lopred
+
+sum(lopred==0 & pimatest$diabetes ==0)
+sum(lopred==0 & pimatest$diabetes ==1)
+sum(lopred==1 & pimatest$diabetes ==0)
+sum(lopred==1 & pimatest$diabetes ==1)
+
+
+sum(lipred != lopred)
+
+

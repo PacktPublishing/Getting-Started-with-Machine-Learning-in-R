@@ -1,0 +1,35 @@
+
+setwd("c:/mlr")
+
+
+pimatrain <- read.csv("pimatrainfixed314.csv")
+pimatest <- read.csv("pimatestfixed314.csv")
+
+summary(pimatrain)
+summary(pimatest)
+
+
+
+install.packages("ggplot2")
+library(ggplot2)
+ 
+ 
+qplot(pimatrain$insulin,pimatrain$glucose)
+
+
+ggplot(pimatrain, aes(x=insulin, y=glucose, color=diabetes)) + geom_point() + scale_color_gradient(low="blue", high="red")
+
+
+
+nbpred6tr <- predict(nbfit6,pimatrain, type="raw")
+nbclass6tr={}
+nbclass6tr <- nbpred6tr[,2]
+
+
+ggplot(pimatrain, aes(x=pimatrain$insulin, y=pimatrain$glucose, color=nbclass6tr)) + geom_point() + scale_color_gradient(low="blue", high="red")
+
+
+
+
+ggplot(pimatrain, aes(x=insulin, y=glucose, color=diabetes)) + geom_point() + scale_color_gradient(low="blue", high="red")+ ggtitle("Top Two Variables") + xlab("Bodymassindex") + ylab("Glucose") + labs  (color = "Diabetes")
+

@@ -1,0 +1,63 @@
+
+
+setwd("c:/mlr")
+
+pima <- read.csv("pima.csv")
+
+colnames(pima)=c("pregnant","glucose","bloodpressure","skinfold","insulin","bodymassindex","diabetespedigree","age","diabetes")
+
+
+summary(pima)
+
+
+
+sum(pima$glucose==0)
+sum(pima$bloodpressure==0)
+sum(pima$skinfold==0)
+sum(pima$insulin==0)
+sum(pima$bodymassindex==0)
+
+
+
+
+set.seed(314)
+
+
+indexes <- sample (1:nrow(pima), size=.3*nrow(pima))
+pimatest <- pima[indexes,]
+pimatrain <- pima[-indexes,]
+
+
+dim(pimatest)
+dim(pimatrain)
+
+
+head(pimatrain)
+head(pimatest)
+
+
+pimatrain$insulin[pimatrain$insulin==0] <- median(pimatrain$insulin[pimatrain$insulin!=0])
+pimatrain$bodymassindex[pimatrain$bodymassindex==0] <- median(pimatrain$bodymassindex[pimatrain$bodymassindex!=0])
+pimatrain$skinfold[pimatrain$skinfold==0] <- median(pimatrain$skinfold[pimatrain$skinfold!=0])
+pimatrain$bloodpressure[pimatrain$bloodpressure==0] <- median(pimatrain$bloodpressure[pimatrain$bloodpressure!=0])
+pimatrain$glucose[pimatrain$glucose==0] <- median(pimatrain$glucose[pimatrain$glucose!=0])
+
+
+summary(pimatrain)
+
+
+write.csv (pimatrain,"pimatrainfixed314.csv")
+
+
+
+pimatest$insulin[pimatest$insulin==0] <- median(pimatrain$insulin[pimatrain$insulin!=0])
+pimatest$bodymassindex[pimatest$bodymassindex==0] <- median(pimatrain$bodymassindex[pimatrain$bodymassindex!=0])
+pimatest$skinfold[pimatest$skinfold==0] <- median(pimatrain$skinfold[pimatrain$skinfold!=0])
+pimatest$bloodpressure[pimatest$bloodpressure==0] <- median(pimatrain$bloodpressure[pimatrain$bloodpressure!=0])
+pimatest$glucose[pimatest$glucose==0] <- median(pimatrain$glucose[pimatrain$glucose!=0])
+
+write.csv (pimatest,"pimatestfixed314.csv")
+
+install.packages("lattice")
+library(lattice)
+splom(pimatrain)

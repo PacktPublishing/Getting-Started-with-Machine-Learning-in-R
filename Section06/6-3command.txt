@@ -1,0 +1,19 @@
+
+
+
+cj <- read.csv("chartjunk.txt")
+summary(cj)
+
+library(grid)
+
+p1 <- ggplot(cj,aes(x=Year,y=PCprice)) + geom_point() + geom_line() + scale_x_continuous(breaks=seq(1990,2002,3)) + ylim(c(0,3)) + ylab("Price, thousands" ) 
+p2 <- ggplot(cj,aes(x=Year,y=unitsshipped)) + geom_point() + geom_line() + scale_x_continuous(breaks=seq(1990,2002,3)) + ylim(c(0,150)) + ylab("Shipped, millions" ) 
+p3 <- ggplot(cj,aes(x=Year,y=chipspeed)) + geom_point() + geom_line() + scale_x_continuous(breaks=seq(1990,2002,3)) + ylim(c(0,3000)) + ylab("Chip speed, mhz" ) 
+
+
+grid.newpage()
+grid.draw(rbind(ggplotGrob(p1), ggplotGrob(p2), ggplotGrob(p3), size = "last"))
+
+
+ 
+

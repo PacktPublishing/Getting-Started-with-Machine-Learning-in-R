@@ -1,0 +1,112 @@
+
+setwd("c:/mlr")
+
+
+pimatrain <- read.csv("pimatrainfixed314.csv")
+pimatest <- read.csv("pimatestfixed314.csv")
+
+summary(pimatrain)
+summary(pimatest)
+
+
+install.packages("e1071")
+library(e1071)
+
+nbfit <- naiveBayes(diabetes ~ pregnant + glucose + bloodpressure + 
+  skinfold + insulin + bodymassindex + diabetespedigree + age,data = pimatrain)
+  
+
+nbpred <- predict(nbfit,pimatest, type="raw")
+
+head(nbpred)
+
+
+nbclass={}
+nbclass [nbpred[,1]<=.5] <- 1
+nbclass [nbpred[,1]>.5] <- 0
+
+head(nbclass)
+
+conf$matrix <- table(nbclass,pimatest$diabetes)
+
+conf$matrix
+
+
+nbpredtr <- predict(nbfit,pimatrain, type="raw")
+
+nbclasstr={}
+nbclasstr [nbpredtr[,1]<=.5] <- 1
+nbclasstr [nbpredtr[,1]>.5] <- 0
+
+conf$matrixtr <- table(nbclasstr,pimatrain$diabetes)
+
+conf$matrixtr
+
+nbfit6 <- naiveBayes(diabetes ~ pregnant + glucose + bloodpressure + 
+   bodymassindex + diabetespedigree + age,data = pimatrain)
+  
+
+
+nbpred6tr <- predict(nbfit6,pimatrain, type="raw")
+
+
+nbclass6tr={}
+nbclass6tr [nbpred6tr[,1]<=.5] <- 1
+nbclass6tr [nbpred6tr[,1]>.5] <- 0
+
+conf$matrix6tr <- table(nbclass6tr,pimatrain$diabetes)
+
+conf$matrix6tr
+
+
+nbpred6 <- predict(nbfit6,pimatest, type="raw")
+
+
+nbclass6={}
+nbclass6 [nbpred6[,1]<=.5] <- 1
+nbclass6 [nbpred6[,1]>.5] <- 0
+
+conf$matrix6 <- table(nbclass6,pimatest$diabetes)
+
+conf$matrix6
+
+
+conf$matrix
+
+
+lifit <- lm(diabetes ~ pregnant + glucose + bloodpressure + skinfold + insulin + bodymassindex + diabetespedigree + age, data = pimatrain)
+
+lipred <- predict(lifit,newdata=pimatest)
+
+lipred[lipred <=.5] <- 0
+lipred[lipred >.5] <- 1
+
+library(randomForest)
+rffit <- randomForest(diabetes ~ pregnant + glucose + bloodpressure + 
+  skinfold + insulin + bodymassindex + diabetespedigree + age, 
+  data=pimatrain,
+  importance=TRUE,
+  mtry=8,
+  ntree=2000)
+  
+rfpred <- predict(rffit,pimatest)
+rfpred[rfpred > .5] <- 1
+rfpred[rfpred <= .5] <- 0
+
+
+
+
+
+sum(nbclass6 != lipred)
+
+sum(nbclass6 != rfpred)
+
+
+
+
+
+ 
+
+
+
+
